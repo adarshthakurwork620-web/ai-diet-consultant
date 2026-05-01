@@ -1,10 +1,19 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Onboarding from './pages/Onboarding'
+import Dashboard from './pages/Dashboard'
+import Consultation from './pages/Consultation'
+import MealPlan from './pages/MealPlan'
+
 function App() {
   return (
-    <div className="min-h-screen bg-green-50 flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-green-600">
-        AI Diet Consultant 🥗
-      </h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Onboarding />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/consultation" element={<Consultation />} />
+        <Route path="/mealplan" element={<MealPlan />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
