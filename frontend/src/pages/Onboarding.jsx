@@ -72,8 +72,6 @@ function Onboarding() {
                 <option value="">Select diet type</option>
                 <option>Vegetarian</option>
                 <option>Non-Vegetarian</option>
-                <option>Vegan</option>
-                <option>Keto</option>
               </select>
 
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Your Goal</label>
