@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_KEY
+console.log('KEY:', GEMINI_KEY) // ← yeh add karo
 
 function Consultation() {
   const navigate = useNavigate()
@@ -20,7 +21,7 @@ function Consultation() {
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
