@@ -1,9 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const GEMINI_KEY = import.meta.env.VITE_GEMINI_KEY
-console.log('KEY:', GEMINI_KEY) // ← yeh add karo
-
 function Consultation() {
   const navigate = useNavigate()
   const [messages, setMessages] = useState([
@@ -20,22 +17,22 @@ function Consultation() {
     setLoading(true)
 
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `You are NutriAI, a friendly expert AI diet consultant. Give personalized practical diet advice. Keep responses concise and helpful. Use emojis occasionally. Focus on Indian food options when relevant. User question: ${input}`
-              }]
-            }]
-          })
-        }
-      )
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_OPENROUTER_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'mistralai/mistral-7b-instruct:free',
+          messages: [
+            { role: 'system', content: 'You are NutriAI, a friendly expert AI diet consultant. Give personalized practical diet advice. Keep responses concise. Use emojis occasionally. Focus on Indian food options when relevant.' },
+            { role: 'user', content: input }
+          ]
+        })
+      })
       const data = await response.json()
-      const aiText = data.candidates[0].content.parts[0].text
+      const aiText = data.choices[0].message.content
       setMessages(prev => [...prev, { role: 'ai', text: aiText }])
     } catch (err) {
       setMessages(prev => [...prev, { role: 'ai', text: 'Sorry, kuch error aayi. Thodi der baad try karo! 🙏' }])
@@ -132,7 +129,7 @@ function Consultation() {
             className="flex-1 border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 focus:shadow-lg focus:shadow-green-100 transition-all duration-300 bg-gray-50 focus:bg-white" />
           <button onClick={sendMessage} disabled={loading}
             className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-2xl font-semibold text-sm hover:scale-105 hover:shadow-lg hover:shadow-green-200 active:scale-95 transition-all duration-300 disabled:opacity-50">
-            Send ↗npm run dev
+            Send ↗
           </button>
         </div>
       </div>
