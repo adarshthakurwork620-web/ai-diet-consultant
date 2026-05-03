@@ -6,3 +6,4 @@ groq
 bcrypt
 pyjwt
 requests 
+gunicorn
