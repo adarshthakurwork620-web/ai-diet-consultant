@@ -41,7 +41,9 @@ function Dashboard() {
 
         {/* Welcome */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Good morning, Adarsh! 👋</h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Good morning, {JSON.parse(localStorage.getItem('user'))?.name || 'Friend'}! 👋
+          </h1>
           <p className="text-gray-400 text-sm mt-1">Here's your health summary for today</p>
         </div>
 
