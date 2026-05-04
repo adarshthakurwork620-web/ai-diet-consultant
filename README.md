@@ -59,29 +59,6 @@ Prerequisites
 - Python 3.10+
 - Groq API Key (free at console.groq.com)
 
-## 📁 Project Structure
-
----
-
-ai-diet-consultant/
-
-├── backend
-   ├── models/
-   │   └── user_model.py      # Database models
-   ├── app.py                 # Flask app & API routes
-   └── requirements.txt       # Python dependencies
-├── frontend/
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── Login.jsx      # Login page
-│   │   │   ├── Register.jsx   # Registration page
-│   │   │   ├── Dashboard.jsx  # Main dashboard
-│   │   │   ├── Consultation.jsx # AI chat
-│   │   │   └── MealPlan.jsx   # Meal planner
-│   │   └── App.jsx            # Routes
-│   └── package.json
-└── README.md
-
 ---
 
 🔌 API Endpoints
