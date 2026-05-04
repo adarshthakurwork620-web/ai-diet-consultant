@@ -7,10 +7,7 @@
 
 ## 🌐 Live Demo
 
-| Service | URL |
-|---|---|
-| 🎨 Frontend | [ai-diet-consultant-liart.vercel.app](https://ai-diet-consultant-liart.vercel.app) |
-| 🔧 Backend API | [nutriai-backend-xspo.onrender.com](https://nutriai-backend-xspo.onrender.com) |
+ URL | https://nutriai-backend-xspo.onrender.com
 
 ---
 
