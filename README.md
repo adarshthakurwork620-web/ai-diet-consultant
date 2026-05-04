@@ -61,8 +61,11 @@ Prerequisites
 
 ## 📁 Project Structure
 
+---
+
 ai-diet-consultant/
-├── backend/
+
+├── backend
 │   ├── models/
 │   │   └── user_model.py      # Database models
 │   ├── app.py                 # Flask app & API routes
