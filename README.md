@@ -7,7 +7,7 @@
 
 ## 🌐 Live Demo
 
- URL | https://nutriai-backend-xspo.onrender.com
+ ai-diet-consultant : https://ai-diet-consultant-liart.vercel.app
 
 ---
 
