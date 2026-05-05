@@ -10,8 +10,7 @@
  ai-diet-consultant : https://ai-diet-consultant-liart.vercel.app
 
 ---
-
- 📸 Screenshots
+Working
 
 > Login → Register → Dashboard → AI Chat → Meal Plan
 
