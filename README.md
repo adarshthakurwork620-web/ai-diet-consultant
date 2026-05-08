@@ -69,15 +69,6 @@ Prerequisites
 
 ---
 
-🎓 About
-
-Built by **Adarsh Thakur** — 2nd Semester Computer Science Student
-
-This project was built as a college project demonstrating full-stack development skills with AI integration.
-
----
-
-
 ---
 
 ⭐ **Star this repo if you found it helpful!**
