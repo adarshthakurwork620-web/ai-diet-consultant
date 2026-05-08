@@ -157,7 +157,7 @@ function Consultation() {
               {/* User Avatar */}
               {msg.role === 'user' && (
                 <div className="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-1">
-                  A
+                  S
                 </div>
               )}
             </div>

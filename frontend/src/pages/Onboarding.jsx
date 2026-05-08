@@ -41,7 +41,7 @@ function Onboarding() {
 
               <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Full Name</label>
               <input name="name" value={form.name} onChange={update}
-                placeholder="e.g. Adarsh Thakur"
+                placeholder="e.g. Siddh Jain"
                 className="w-full border-2 border-gray-100 rounded-xl p-3 mt-1 mb-4 focus:outline-none focus:border-green-400 focus:shadow-lg focus:shadow-green-100 text-gray-700 transition-all duration-300 hover:border-green-200 bg-gray-50 focus:bg-white" />
 
               <div className="grid grid-cols-3 gap-3 mb-6">

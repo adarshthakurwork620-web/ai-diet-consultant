@@ -10,8 +10,7 @@
  ai-diet-consultant : https://ai-diet-consultant-liart.vercel.app
 
 ---
-
- 📸 Screenshots
+Working
 
 > Login → Register → Dashboard → AI Chat → Meal Plan
 
@@ -69,6 +68,9 @@ Prerequisites
 
 ---
 
+<<<<<<< HEAD
 ---
 
+=======
+>>>>>>> cc33faddfa0f929145ab7f6623d5747d316a0415
 ⭐ **Star this repo if you found it helpful!**
