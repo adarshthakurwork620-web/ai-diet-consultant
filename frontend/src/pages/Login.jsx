@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_BASE } from '../api'
 
 function Login() {
   const navigate = useNavigate()
@@ -18,7 +19,7 @@ function Login() {
     setError('')
 
     try {
-      const response = await fetch('https://nutriai-backend-xspo.onrender.com/api/login', {
+      const response = await fetch(`${API_BASE}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -38,105 +39,91 @@ function Login() {
     setLoading(false)
   }
 
-  const inputStyle = {
-    width: '100%',
-    background: 'rgba(255,255,255,0.04)',
-    border: '0.5px solid rgba(255,255,255,0.12)',
-    borderRadius: 8,
-    padding: '10px 12px',
-    color: '#f0f0f8',
-    fontSize: 13,
-    outline: 'none',
-    marginTop: 4,
-    marginBottom: 14,
-  }
-
-  const labelStyle = {
-    fontSize: 10,
-    color: '#555',
-    textTransform: 'uppercase',
-    letterSpacing: '0.06em',
-  }
-
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: 'system-ui, sans-serif' }}>
+    <div className="min-h-screen bg-slate-950 flex flex-col">
 
       {/* Navbar */}
-      <nav style={{ background: 'rgba(10,10,15,0.97)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-          <div style={{ width: 28, height: 28, background: '#22c55e', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, color: '#fff', fontSize: 12 }}>N</div>
-          <span style={{ fontSize: 14, fontWeight: 500, color: '#f0f0f8' }}>NutriAI</span>
+      <nav className="bg-slate-900/98 border-b border-slate-800/50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+        <div onClick={() => navigate('/')} className="flex items-center gap-2 sm:gap-3 cursor-pointer hover:opacity-80 transition">
+          <div className="w-6 sm:w-7 h-6 sm:h-7 bg-green-500 rounded-lg flex items-center justify-center font-bold text-white text-xs sm:text-sm">N</div>
+          <span className="text-sm sm:text-base font-semibold text-slate-100">NutriAI</span>
         </div>
-        <span style={{ fontSize: 12, color: '#555', cursor: 'pointer' }} onClick={() => navigate('/')}>← Back to home</span>
+        <span className="text-xs sm:text-sm text-slate-400 cursor-pointer hover:text-slate-200 transition" onClick={() => navigate('/')}>← Back to home</span>
       </nav>
 
       {/* Body */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px', position: 'relative' }}>
+      <div className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12 relative overflow-hidden">
         {/* Glows */}
-        <div style={{ position: 'absolute', top: 60, left: 60, width: 200, height: 200, background: 'rgba(34,197,94,0.05)', borderRadius: '50%', filter: 'blur(50px)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: 60, right: 60, width: 180, height: 180, background: 'rgba(96,165,250,0.04)', borderRadius: '50%', filter: 'blur(50px)', pointerEvents: 'none' }} />
+        <div className="absolute top-12 left-10 w-64 h-64 bg-green-500/5 rounded-full filter blur-3xl pointer-events-none" />
+        <div className="absolute bottom-12 right-10 w-64 h-64 bg-blue-500/5 rounded-full filter blur-3xl pointer-events-none" />
 
-        <div style={{ background: 'rgba(255,255,255,0.03)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, width: '100%', maxWidth: 360, overflow: 'hidden', position: 'relative', zIndex: 1 }}>
+        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800/50 rounded-2xl w-full max-w-sm overflow-hidden relative z-10 shadow-2xl">
 
           {/* Card Header */}
-          <div style={{ background: 'rgba(22,101,52,0.35)', borderBottom: '0.5px solid rgba(34,197,94,0.2)', padding: '22px 24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-              <div style={{ width: 32, height: 32, background: '#22c55e', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, color: '#fff', fontSize: 13 }}>N</div>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#f0f0f8' }}>NutriAI</span>
+          <div className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border-b border-green-500/20 px-6 sm:px-8 py-6 sm:py-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 sm:w-10 h-8 sm:h-10 bg-green-500 rounded-lg flex items-center justify-center font-bold text-white text-sm">N</div>
+              <span className="text-base sm:text-lg font-semibold text-slate-100">NutriAI</span>
             </div>
-            <h2 style={{ fontSize: 20, fontWeight: 500, color: '#f0f0f8', marginBottom: 4 }}>Welcome back!</h2>
-            <p style={{ fontSize: 12, color: '#86efac' }}>Login to your NutriAI account</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-100 mb-2">Welcome back!</h2>
+            <p className="text-xs sm:text-sm text-green-300">Login to your NutriAI account</p>
           </div>
 
           {/* Card Body */}
-          <div style={{ padding: 24 }}>
+          <div className="px-6 sm:px-8 py-8 space-y-6">
 
             {/* Tabs */}
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: 3, marginBottom: 18 }}>
-              <div style={{ flex: 1, padding: '7px 0', textAlign: 'center', borderRadius: 6, fontSize: 12, background: 'rgba(34,197,94,0.12)', color: '#4ade80', border: '0.5px solid rgba(34,197,94,0.3)', cursor: 'pointer' }}>Login</div>
-              <div onClick={() => navigate('/register')} style={{ flex: 1, padding: '7px 0', textAlign: 'center', borderRadius: 6, fontSize: 12, color: '#555', cursor: 'pointer' }}>Register</div>
+            <div className="flex gap-2 bg-slate-800/50 rounded-lg p-1">
+              <div className="flex-1 px-3 py-2 rounded-md text-xs sm:text-sm font-semibold bg-green-500/20 text-green-300 border border-green-500/30">Login</div>
+              <div onClick={() => navigate('/register')} className="flex-1 px-3 py-2 rounded-md text-xs sm:text-sm font-semibold text-slate-400 cursor-pointer hover:text-slate-200 transition">Register</div>
             </div>
 
             {error && (
-              <div style={{ background: 'rgba(239,68,68,0.08)', border: '0.5px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#fca5a5', marginBottom: 14 }}>
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-red-300">
                 ⚠️ {error}
               </div>
             )}
 
-            <label style={labelStyle}>Email</label>
-            <input name="email" value={form.email} onChange={update} placeholder="siddhj@email.com" type="email" style={inputStyle} />
+            <div>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2">Email</label>
+              <input name="email" value={form.email} onChange={update} placeholder="siddhj@email.com" type="email" className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm placeholder-slate-500 focus:border-green-500 focus:outline-none transition-all" />
+            </div>
 
-            <label style={labelStyle}>Password</label>
-            <input name="password" value={form.password} onChange={update} placeholder="••••••••" type="password" style={inputStyle} />
+            <div>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2">Password</label>
+              <input name="password" value={form.password} onChange={update} placeholder="••••••••" type="password" className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm placeholder-slate-500 focus:border-green-500 focus:outline-none transition-all" />
+            </div>
 
-            <div style={{ textAlign: 'right', fontSize: 11, color: '#4ade80', marginBottom: 14, cursor: 'pointer', marginTop: -8 }}>Forgot password?</div>
+            <div className="text-right">
+              <button className="text-xs sm:text-sm text-green-400 hover:text-green-300 transition font-medium">Forgot password?</button>
+            </div>
 
-            <button onClick={handleLogin} disabled={loading} style={{ width: '100%', padding: 11, borderRadius: 9, background: '#22c55e', color: '#fff', border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer', marginBottom: 14, opacity: loading ? 0.6 : 1 }}>
+            <button onClick={handleLogin} disabled={loading} className="w-full py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 disabled:opacity-50 transition-all text-sm sm:text-base">
               {loading ? 'Logging in...' : 'Login →'}
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-              <div style={{ flex: 1, height: 0.5, background: 'rgba(255,255,255,0.07)' }} />
-              <span style={{ fontSize: 11, color: '#333' }}>or continue with</span>
-              <div style={{ flex: 1, height: 0.5, background: 'rgba(255,255,255,0.07)' }} />
+            <div className="flex items-center gap-4">
+              <div className="flex-1 h-px bg-slate-700/50" />
+              <span className="text-xs text-slate-500">or continue with</span>
+              <div className="flex-1 h-px bg-slate-700/50" />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
-              <div style={{ padding: 9, borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.1)', color: '#aaa', fontSize: 12, cursor: 'pointer', textAlign: 'center' }}>🔵 Google</div>
-              <div style={{ padding: 9, borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.1)', color: '#aaa', fontSize: 12, cursor: 'pointer', textAlign: 'center' }}>⚫ GitHub</div>
+            <div className="grid grid-cols-2 gap-3">
+              <button className="py-2 px-3 rounded-lg bg-slate-800/50 border border-slate-700 text-slate-400 text-xs sm:text-sm font-medium hover:border-slate-600 transition">🔵 Google</button>
+              <button className="py-2 px-3 rounded-lg bg-slate-800/50 border border-slate-700 text-slate-400 text-xs sm:text-sm font-medium hover:border-slate-600 transition">⚫ GitHub</button>
             </div>
 
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#555' }}>
+            <p className="text-center text-xs sm:text-sm text-slate-400">
               Account nahi hai?{' '}
-              <span onClick={() => navigate('/register')} style={{ color: '#4ade80', cursor: 'pointer' }}>Register karo</span>
+              <span onClick={() => navigate('/register')} className="text-green-400 cursor-pointer hover:text-green-300 font-medium transition">Register karo</span>
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 16, marginTop: 16, position: 'absolute', bottom: 24 }}>
-          <span style={{ fontSize: 11, color: '#333' }}>🔒 SSL Secured</span>
-          <span style={{ fontSize: 11, color: '#333' }}>✓ Free to join</span>
-          <span style={{ fontSize: 11, color: '#333' }}>No spam</span>
+        <div className="flex gap-4 flex-wrap justify-center absolute bottom-6 text-xs text-slate-600">
+          <span>🔒 SSL Secured</span>
+          <span>✓ Free to join</span>
+          <span>No spam</span>
         </div>
       </div>
     </div>
