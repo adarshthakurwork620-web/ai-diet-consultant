@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_BASE } from '../api'
 
 function Register() {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', age: '', weight: '', height: '', dietType: '', goal: '' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', age: '', weight: '', height: '', diet_type: '', goal: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -20,10 +21,10 @@ function Register() {
   }
 
   const handleRegister = async () => {
-    if (!form.age || !form.weight || !form.height || !form.dietType || !form.goal) { setError('Please fill all fields!'); return }
+    if (!form.age || !form.weight || !form.height || !form.diet_type || !form.goal) { setError('Please fill all fields!'); return }
     setLoading(true); setError('')
     try {
-      const response = await fetch('https://nutriai-backend-xspo.onrender.com/api/register', {
+      const response = await fetch(`${API_BASE}/api/register`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form)
       })
       const data = await response.json()
@@ -98,7 +99,7 @@ function Register() {
               <>
                 <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 14 }}>Preferences</div>
                 <label style={labelStyle}>Diet Type</label>
-                <select name="dietType" value={form.dietType} onChange={update} style={{ ...inputStyle, background: 'rgba(255,255,255,0.06)' }}>
+                <select name="diet_type" value={form.diet_type} onChange={update} style={{ ...inputStyle, background: 'rgba(255,255,255,0.06)' }}>
                   <option value="">Select diet type</option>
                   {['Vegetarian', 'Non-Vegetarian', 'Vegan', 'Keto'].map(d => <option key={d}>{d}</option>)}
                 </select>

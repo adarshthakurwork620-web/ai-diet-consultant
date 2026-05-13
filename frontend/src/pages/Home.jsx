@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_BASE } from '../api'
 
 function Login() {
   const navigate = useNavigate()
@@ -19,7 +20,7 @@ function Login() {
     if (!loginForm.email || !loginForm.password) { setError('Sab fields bharo!'); return }
     setLoading(true); setError('')
     try {
-      const res = await fetch('https://nutriai-backend-xspo.onrender.com/api/login', {
+      const res = await fetch(`${API_BASE}/api/login`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginForm)
       })
@@ -37,7 +38,7 @@ function Login() {
     if (!registerForm.diet_type || !registerForm.goal) { setError('Sab fields bharo!'); return }
     setLoading(true); setError('')
     try {
-      const res = await fetch('https://nutriai-backend-xspo.onrender.com/api/register', {
+      const res = await fetch(`${API_BASE}/api/register`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...registerForm, age: parseInt(registerForm.age), weight: parseFloat(registerForm.weight), height: parseFloat(registerForm.height) })
       })

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_BASE } from '../api'
 
 function Consultation() {
   const navigate = useNavigate()
@@ -22,7 +23,7 @@ function Consultation() {
     setLoading(true)
 
     try {
-      const response = await fetch('https://nutriai-backend-xspo.onrender.com/api/chat', {
+      const response = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg })
