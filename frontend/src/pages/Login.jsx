@@ -211,7 +211,7 @@ function Login() {
               <span className="text-2xl">🥗</span>
               <span className="text-xl font-bold text-green-600">NutriAI</span>
             </div>
-            <p className="text-gray-400 text-sm">© 2025 NutriAI. Built with ❤️ by Adarsh Thakur</p>
+            <p className="text-gray-400 text-sm">© 2026 NutriAI.</p>
             <div className="flex items-center gap-3">
               <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold">React</span>
               <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-semibold">Flask</span>
