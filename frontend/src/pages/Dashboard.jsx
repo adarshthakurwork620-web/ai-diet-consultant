@@ -3,211 +3,254 @@ import { useNavigate } from 'react-router-dom'
 
 function Dashboard() {
   const navigate = useNavigate()
-  const user = JSON.parse(localStorage.getItem('user')) || { name: 'Siddh Jain' }
+  const [user, setUser] = useState(null)
+  const [time, setTime] = useState(new Date())
+  const [activeTab, setActiveTab] = useState('today')
 
-  // BMI Logic remains same but UI is upgraded
-  const [bmi, setBmi] = useState({ w: 60, h: 165, a: 20 })
-  const [bmiResult, setBmiResult] = useState({ val: 22.0, cat: 'Normal', pct: 38, color: 'text-emerald-500' })
-  const [streakLogged, setStreakLogged] = useState(false)
+  useEffect(() => {
+    const userData = localStorage.getItem('user')
+    if (!userData) { navigate('/'); return }
+    setUser(JSON.parse(userData))
+    const timer = setInterval(() => setTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [navigate])
 
-  const calcBMI = () => {
-    const val = bmi.w / ((bmi.h / 100) ** 2)
-    const b = Math.round(val * 10) / 10
-    let cat, color
-    if (b < 18.5) { cat = 'Underweight'; color = 'text-blue-400' }
-    else if (b < 25) { cat = 'Normal'; color = 'text-emerald-500' }
-    else if (b < 30) { cat = 'Overweight'; color = 'text-orange-400' }
-    else { cat = 'Obese'; color = 'text-rose-500' }
-    setBmiResult({ val: b.toFixed(1), cat, color })
+  const getGreeting = () => {
+    const h = time.getHours()
+    if (h < 12) return { text: 'Good Morning', icon: '🌅' }
+    if (h < 17) return { text: 'Good Afternoon', icon: '☀️' }
+    return { text: 'Good Evening', icon: '🌙' }
   }
 
   const metrics = [
-    { label: 'Energy', value: '1,340', unit: 'kcal', target: '1,800', color: 'bg-orange-500', pct: 74, icon: '🔥' },
-    { label: 'Protein', value: '68', unit: 'g', target: '90', color: 'bg-blue-500', pct: 75, icon: '💪' },
-    { label: 'Hydration', value: '1.8', unit: 'L', target: '2.5', color: 'bg-cyan-500', pct: 72, icon: '💧' },
+    { label: 'Calories', value: '1,340', goal: '1,800', unit: 'kcal', icon: '🔥', color: 'from-orange-400 to-red-500', light: 'bg-orange-50', text: 'text-orange-500', percent: 74 },
+    { label: 'Protein', value: '68', goal: '90', unit: 'g', icon: '💪', color: 'from-blue-400 to-indigo-500', light: 'bg-blue-50', text: 'text-blue-500', percent: 76 },
+    { label: 'Water', value: '1.8', goal: '2.5', unit: 'L', icon: '💧', color: 'from-cyan-400 to-blue-500', light: 'bg-cyan-50', text: 'text-cyan-500', percent: 72 },
+    { label: 'BMI', value: '22.4', goal: 'Normal', unit: '', icon: '⚖️', color: 'from-green-400 to-emerald-500', light: 'bg-green-50', text: 'text-green-500', percent: 85 },
   ]
 
+  const meals = [
+    { type: 'Breakfast', time: '8:00 AM', food: 'Oats + Banana + Milk', cal: 320, tag: 'Healthy', color: 'bg-green-100 text-green-700', icon: '🌅', done: true },
+    { type: 'Lunch', time: '1:00 PM', food: 'Dal Rice + Salad', cal: 580, tag: 'Balanced', color: 'bg-blue-100 text-blue-700', icon: '☀️', done: true },
+    { type: 'Snack', time: '4:00 PM', food: 'Roasted Chana + Green Tea', cal: 120, tag: 'Light', color: 'bg-yellow-100 text-yellow-700', icon: '🍎', done: true },
+    { type: 'Dinner', time: '7:30 PM', food: 'Roti + Sabzi + Curd', cal: 450, tag: 'Pending', color: 'bg-gray-100 text-gray-600', icon: '🌙', done: false },
+  ]
+
+  const quickActions = [
+    { icon: '🤖', label: 'Ask AI', desc: 'Get diet advice', action: () => navigate('/consultation'), color: 'from-violet-500 to-purple-600' },
+    { icon: '📋', label: 'Meal Plan', desc: 'View 7-day plan', action: () => navigate('/mealplan'), color: 'from-green-500 to-emerald-600' },
+    { icon: '📊', label: 'Progress', desc: 'Track goals', action: () => {}, color: 'from-blue-500 to-cyan-600' },
+    { icon: '🍽️', label: 'Log Meal', desc: 'Add food entry', action: () => {}, color: 'from-orange-500 to-red-500' },
+  ]
+
+  if (!user) return null
+
+  const greeting = getGreeting()
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans pb-12">
-      
-      {/* PREMIUM NAVIGATION */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2 group cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-9 h-9 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200 group-hover:rotate-12 transition-transform">
+    <div className="min-h-screen bg-gray-50">
+
+      {/* Navbar */}
+      <nav className="bg-white border-b border-gray-100 px-6 py-4 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md shadow-green-200">
               <span className="text-lg">🥗</span>
             </div>
-            <span className="text-xl font-black tracking-tighter text-slate-800">NutriAI</span>
+            <span className="text-lg font-bold text-gray-900" style={{fontFamily:'Syne, sans-serif'}}>NutriAI</span>
           </div>
-          
-          <div className="hidden md:flex bg-slate-100 p-1 rounded-2xl gap-1">
-            {[['Insights', '/dashboard'], ['Meal Plan', '/mealplan'], ['AI Consultant', '/consultation']].map(([label, path]) => (
-              <button 
-                key={label} 
-                onClick={() => navigate(path)}
-                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${path === '/dashboard' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
-              >
-                {label}
+
+          <div className="hidden md:flex items-center gap-1 bg-gray-100 rounded-2xl p-1">
+            {['Dashboard', 'Consultation', 'Meal Plan'].map((item, i) => (
+              <button key={i}
+                onClick={() => navigate(item === 'Dashboard' ? '/dashboard' : item === 'Consultation' ? '/consultation' : '/mealplan')}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200
+                  ${item === 'Dashboard' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}>
+                {item}
               </button>
             ))}
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <div className="text-sm font-bold text-slate-800">{user.name}</div>
-              <div className="text-[10px] uppercase tracking-widest text-emerald-500 font-black">Pro Member</div>
-            </div>
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold shadow-md">
-              {user.name?.charAt(0)}
+          <div className="flex items-center gap-3">
+            <button className="relative w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-colors">
+              🔔
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2 cursor-pointer hover:bg-gray-200 transition-colors"
+              onClick={() => { localStorage.clear(); navigate('/') }}>
+              <div className="w-7 h-7 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-xs font-bold">
+                {user?.name?.[0]?.toUpperCase() || 'U'}
+              </div>
+              <span className="text-sm font-semibold text-gray-700 hidden md:block">{user?.name}</span>
+              <span className="text-xs text-gray-400">↩</span>
             </div>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 pt-10">
-        
-        {/* HEADER SECTION */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <div className="max-w-6xl mx-auto px-6 py-8">
+
+        {/* Header */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight">Welcome back, {user.name.split(' ')[0]}!</h1>
-            <p className="text-slate-500 font-medium mt-1">You're <span className="text-emerald-600 font-bold">85%</span> through your weekly fitness goal. Keep it up!</p>
+            <h1 className="text-3xl font-extrabold text-gray-900" style={{fontFamily:'Syne, sans-serif'}}>
+              {greeting.icon} {greeting.text}, {user?.name?.split(' ')[0]}!
+            </h1>
+            <p className="text-gray-400 mt-1 text-sm">
+              {time.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
           </div>
-          <div className="flex gap-3">
-             <button onClick={() => setStreakLogged(true)} className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold hover:bg-emerald-600 transition-all shadow-xl shadow-slate-200 flex items-center gap-2">
-                {streakLogged ? '✅ Logged' : '快速 Log Meal +'}
-             </button>
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-green-200">
+              🔥 18 Day Streak
+            </div>
+            <div className="bg-white border border-gray-100 text-gray-600 px-4 py-2 rounded-2xl text-sm font-semibold shadow-sm">
+              🎯 {user?.goal || 'Weight Loss'}
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* LEFT COLUMN: MAIN METRICS */}
-          <div className="lg:col-span-8 space-y-8">
-            
-            {/* BIG METRICS BENTO */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {metrics.map((m, i) => (
-                <div key={i} className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-slate-200/50 transition-all group">
-                   <div className="flex justify-between items-start mb-4">
-                      <span className="text-2xl">{m.icon}</span>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{m.label}</span>
-                   </div>
-                   <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-black text-slate-900 tracking-tighter">{m.value}</span>
-                      <span className="text-slate-400 font-bold text-sm">{m.unit}</span>
-                   </div>
-                   <p className="text-xs font-medium text-slate-400 mt-1">Goal: {m.target} {m.unit}</p>
-                   <div className="h-2 bg-slate-100 rounded-full mt-6 overflow-hidden">
-                      <div className={`h-full ${m.color} rounded-full transition-all duration-1000 group-hover:opacity-80`} style={{ width: `${m.pct}%` }} />
-                   </div>
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {quickActions.map((a, i) => (
+            <button key={i} onClick={a.action}
+              className="bg-white rounded-2xl p-4 border border-gray-100 hover:border-green-200 hover:shadow-lg hover:shadow-green-50 hover:-translate-y-0.5 transition-all duration-300 text-left group">
+              <div className={`w-10 h-10 bg-gradient-to-br ${a.color} rounded-xl flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
+                {a.icon}
+              </div>
+              <p className="font-bold text-gray-800 text-sm">{a.label}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{a.desc}</p>
+            </button>
+          ))}
+        </div>
+
+        {/* Streak Banner */}
+        <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 rounded-3xl p-6 mb-8 text-white relative overflow-hidden">
+          <div className="absolute -top-6 -right-6 w-32 h-32 bg-white/10 rounded-full"></div>
+          <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-white/10 rounded-full"></div>
+          <div className="absolute top-4 right-16 w-3 h-3 bg-white/30 rounded-full"></div>
+          <div className="flex items-center justify-between relative z-10">
+            <div>
+              <p className="text-green-100 text-sm font-medium mb-1">Current Streak 🔥</p>
+              <p className="text-5xl font-extrabold" style={{fontFamily:'Syne, sans-serif'}}>18 Days</p>
+              <p className="text-green-100 text-sm mt-1">Keep it up! You're on fire! 💪</p>
+            </div>
+            <div className="text-right">
+              <p className="text-green-100 text-sm font-medium mb-1">Goal Progress</p>
+              <p className="text-4xl font-extrabold" style={{fontFamily:'Syne, sans-serif'}}>42%</p>
+              <div className="bg-white/20 rounded-full h-2 w-32 mt-2">
+                <div className="bg-white rounded-full h-2 transition-all duration-1000" style={{width:'42%'}}></div>
+              </div>
+              <p className="text-green-100 text-xs mt-1">Weight Loss Goal</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Metrics */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {metrics.map((m, i) => (
+            <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 hover:border-green-200 hover:shadow-lg hover:shadow-green-50 hover:-translate-y-0.5 transition-all duration-300">
+              <div className={`w-10 h-10 ${m.light} rounded-xl flex items-center justify-center text-xl mb-3`}>
+                {m.icon}
+              </div>
+              <p className="text-2xl font-extrabold text-gray-900" style={{fontFamily:'Syne, sans-serif'}}>
+                {m.value}<span className="text-sm font-normal text-gray-400 ml-1">{m.unit}</span>
+              </p>
+              <p className="text-xs text-gray-400 mt-0.5">of {m.goal} {m.unit} goal</p>
+              <p className="text-sm font-semibold text-gray-600 mt-1">{m.label}</p>
+              {/* Progress bar */}
+              <div className="mt-3 bg-gray-100 rounded-full h-1.5">
+                <div className={`bg-gradient-to-r ${m.color} rounded-full h-1.5 transition-all duration-1000`}
+                  style={{width:`${m.percent}%`}}></div>
+              </div>
+              <p className={`text-xs ${m.text} font-semibold mt-1`}>{m.percent}%</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          {/* Today's Meals */}
+          <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold text-gray-800" style={{fontFamily:'Syne, sans-serif'}}>🍽️ Today's Meals</h2>
+              <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+                {['today', 'week'].map(t => (
+                  <button key={t} onClick={() => setActiveTab(t)}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${activeTab === t ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-400'}`}>
+                    {t.charAt(0).toUpperCase() + t.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {meals.map((meal, i) => (
+                <div key={i}
+                  className={`flex items-center justify-between p-3 rounded-2xl transition-all duration-200 hover:bg-gray-50 ${meal.done ? '' : 'opacity-60'}`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg ${meal.done ? 'bg-green-100' : 'bg-gray-100'}`}>
+                      {meal.icon}
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 font-medium">{meal.type} · {meal.time}</p>
+                      <p className="text-sm font-semibold text-gray-700">{meal.food}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className={`text-xs font-bold px-2 py-1 rounded-lg ${meal.color}`}>{meal.tag}</span>
+                    <p className="text-xs text-gray-400 mt-1">{meal.cal} kcal</p>
+                  </div>
                 </div>
               ))}
             </div>
 
-            {/* MEAL PREVIEW & AI INSIGHT */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-               <div className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-                  <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center justify-between">
-                    Today's Meals 
-                    <span className="text-xs font-bold text-emerald-500 cursor-pointer">+ Add</span>
-                  </h3>
-                  <div className="space-y-6">
-                    {[
-                      { name: 'Oats with Banana', cal: '320', time: '08:30 AM', icon: '🥣' },
-                      { name: 'Dal Rice & Salad', cal: '580', time: '01:45 PM', icon: '🍱' },
-                      { name: 'Greek Yogurt', cal: '140', time: '05:00 PM', icon: '🥛' },
-                    ].map((meal, idx) => (
-                      <div key={idx} className="flex items-center gap-4 group cursor-pointer">
-                        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-xl group-hover:bg-emerald-50 transition-colors">
-                          {meal.icon}
-                        </div>
-                        <div className="flex-1">
-                           <div className="text-sm font-bold text-slate-800">{meal.name}</div>
-                           <div className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{meal.time}</div>
-                        </div>
-                        <div className="text-sm font-black text-slate-700">{meal.cal} kcal</div>
-                      </div>
-                    ))}
-                  </div>
-               </div>
-
-               <div className="bg-slate-900 rounded-[32px] p-8 text-white relative overflow-hidden flex flex-col justify-between">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl"></div>
-                  <div>
-                    <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 px-3 py-1 rounded-full mb-6">
-                      <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-300">AI Health Insight</span>
-                    </div>
-                    <p className="text-lg font-medium leading-relaxed text-emerald-50">
-                      "You're a bit low on <span className="text-emerald-400 font-bold underline">Protein</span> today. Adding 2 boiled eggs or a bowl of Dal to your dinner will hit your 90g target perfectly!"
-                    </p>
-                  </div>
-                  <button onClick={() => navigate('/consultation')} className="mt-8 w-full bg-white text-slate-900 py-4 rounded-2xl font-bold hover:bg-emerald-50 transition-colors">
-                    Ask Consultant →
-                  </button>
-               </div>
-            </div>
+            <button className="w-full mt-4 py-3 border-2 border-dashed border-gray-200 rounded-2xl text-sm font-semibold text-gray-400 hover:border-green-400 hover:text-green-500 transition-all duration-300">
+              + Log Dinner
+            </button>
           </div>
 
-          {/* RIGHT COLUMN: SIDEBAR TOOLS */}
-          <div className="lg:col-span-4 space-y-8">
-            
-            {/* STREAK CARD */}
-            <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[32px] p-8 text-white shadow-xl shadow-emerald-100">
-               <div className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-2">Consistency Score</div>
-               <div className="text-5xl font-black mb-4">18 <span className="text-2xl font-medium opacity-80 italic underline decoration-2 underline-offset-4">days</span> 🔥</div>
-               <div className="grid grid-cols-7 gap-2">
-                 {['M','T','W','T','F','S','S'].map((d, i) => (
-                   <div key={i} className={`h-10 rounded-xl flex items-center justify-center text-xs font-black ${i === 5 ? 'bg-white text-emerald-600' : 'bg-white/20 text-white'}`}>
-                     {d}
-                   </div>
-                 ))}
-               </div>
+          {/* AI Suggestion */}
+          <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex flex-col">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md shadow-purple-200">
+                <span className="text-xl">🤖</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-800" style={{fontFamily:'Syne, sans-serif'}}>AI Suggestion</h2>
+                <p className="text-xs text-green-500 font-medium flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Analyzing your data
+                </p>
+              </div>
             </div>
 
-            {/* UPGRADED BMI CALCULATOR */}
-            <div className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-              <h3 className="text-lg font-black text-slate-800 mb-6">Body Metrics</h3>
-              <div className="space-y-4 mb-6">
-                {[['Weight (kg)', 'w'], ['Height (cm)', 'h']].map(([lbl, key]) => (
-                  <div key={key}>
-                    <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">{lbl}</label>
-                    <input 
-                      type="number" 
-                      value={bmi[key]}
-                      onChange={e => setBmi({ ...bmi, [key]: parseFloat(e.target.value) })}
-                      className="w-full bg-slate-50 border-2 border-transparent focus:border-emerald-500 rounded-2xl px-4 py-3 outline-none font-bold transition-all"
-                    />
+            <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-4 mb-4 flex-1">
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Great progress today! 🎉 Your protein intake is a bit low. For dinner, try adding:
+              </p>
+              <div className="mt-3 space-y-2">
+                {['🥚 2 boiled eggs (+12g protein)', '🧀 50g paneer (+9g protein)', '🫘 1 cup dal (+9g protein)'].map((tip, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-white rounded-xl p-2.5 text-sm text-gray-700 shadow-sm">
+                    <span>{tip}</span>
                   </div>
                 ))}
               </div>
-              
-              <button onClick={calcBMI} className="w-full bg-slate-100 text-slate-600 py-3 rounded-2xl font-bold hover:bg-emerald-500 hover:text-white transition-all mb-6">
-                Update BMI
-              </button>
-
-              <div className="text-center p-6 bg-slate-50 rounded-[24px]">
-                <div className={`text-5xl font-black tracking-tighter ${bmiResult.color}`}>{bmiResult.val}</div>
-                <div className="text-xs font-black uppercase tracking-widest text-slate-400 mt-2">{bmiResult.cat}</div>
-                
-                {/* Visual Gauge */}
-                <div className="mt-4 flex h-1.5 rounded-full overflow-hidden bg-slate-200">
-                  <div className="w-[20%] bg-blue-400" />
-                  <div className="w-[30%] bg-emerald-500" />
-                  <div className="w-[25%] bg-orange-400" />
-                  <div className="w-[25%] bg-rose-500" />
-                </div>
-              </div>
             </div>
 
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => navigate('/consultation')}
+                className="btn-primary py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2">
+                💬 Ask AI More
+              </button>
+              <button onClick={() => navigate('/mealplan')}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-2xl text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                📋 View Plan
+              </button>
+            </div>
           </div>
         </div>
-      </main>
-
-      <style jsx>{`
-        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        main { animation: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-      `}</style>
+      </div>
     </div>
   )
 }
