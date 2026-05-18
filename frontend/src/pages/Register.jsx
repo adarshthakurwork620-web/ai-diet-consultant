@@ -1,213 +1,279 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-function Register() {
+const API = 'https://nutriai-backend-xspo.onrender.com'
+
+export default function Register() {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [form, setForm] = useState({
+  const [reg, setReg] = useState({
     name: '', email: '', password: '',
     age: '', weight: '', height: '',
     diet_type: '', goal: ''
   })
 
-  const update = (e) => setForm({ ...form, [e.target.name]: e.target.value })
+  const up = e => setReg(p => ({ ...p, [e.target.name]: e.target.value }))
 
-  const handleRegister = async () => {
-    if (!form.diet_type || !form.goal) {
-      setError('Please select diet type and goal!')
-      return
-    }
-    setLoading(true)
-    setError('')
-
+  const doRegister = async () => {
+    if (!reg.diet_type || !reg.goal) return setError('Please select diet type and goal!')
+    setLoading(true); setError('')
     try {
-      const response = await fetch('https://nutriai-backend-xspo.onrender.com/api/register', {
+      const r = await fetch(`${API}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...form,
-          age: parseInt(form.age),
-          weight: parseFloat(form.weight),
-          height: parseFloat(form.height)
+          ...reg,
+          age: parseInt(reg.age),
+          weight: parseFloat(reg.weight),
+          height: parseFloat(reg.height)
         })
       })
-      const data = await response.json()
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
+      const d = await r.json()
+      if (r.ok) {
+        localStorage.setItem('token', d.token)
+        localStorage.setItem('user', JSON.stringify(d.user))
         navigate('/dashboard')
-      } else {
-        setError(data.error || 'Registration failed!')
-      }
-    } catch (err) {
-      setError('Server se connect nahi ho pa raha!')
-    }
+      } else setError(d.error || 'Registration failed!')
+    } catch { setError('Cannot connect to server!') }
     setLoading(false)
   }
 
+  const Field = ({ label, name, type = 'text', placeholder, value }) => (
+    <div className="mb-4">
+      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">{label}</label>
+      <input name={name} type={type} placeholder={placeholder} value={value} onChange={up}
+        className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-gray-900 font-medium text-sm focus:outline-none focus:border-green-400 focus:bg-white focus:shadow-md focus:shadow-green-100 transition-all duration-200 placeholder-gray-300" />
+    </div>
+  )
+
+  const steps = ['Account', 'Body Info', 'Preferences']
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center p-4 relative overflow-hidden"
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
-      <div className="fixed top-10 left-10 w-72 h-72 bg-green-200 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"></div>
-      <div className="fixed bottom-10 right-10 w-72 h-72 bg-emerald-200 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"></div>
+      {/* BG blobs */}
+      <div className="absolute top-10 left-10 w-72 h-72 bg-green-200/30 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-72 h-72 bg-emerald-200/20 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-white/60 relative z-10">
+      <div className="w-full max-w-md relative z-10">
 
-        {/* Header */}
-        <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 p-6 text-white relative overflow-hidden">
-          <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full"></div>
-          <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full"></div>
-          <div className="text-4xl mb-1">🥗</div>
-          <h1 className="text-2xl font-bold">NutriAI</h1>
-          <p className="text-green-100 text-sm">Create your account</p>
-          <div className="mt-4 bg-white/20 rounded-full h-2">
-            <div className="bg-white rounded-full h-2 transition-all duration-700"
-              style={{ width: step === 1 ? '33%' : step === 2 ? '66%' : '100%' }}></div>
+        {/* Logo */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-2.5 cursor-pointer" onClick={() => navigate('/')}>
+            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-200">
+              <span className="text-xl">🥗</span>
+            </div>
+            <span className="text-xl font-extrabold text-gray-900">NutriAI</span>
           </div>
-          <p className="text-green-100 text-xs mt-1">Step {step} of 3</p>
+          <p className="text-gray-400 text-sm mt-2">Create your free account</p>
         </div>
 
-        <div className="p-6">
+        {/* Card */}
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4">
-              ⚠️ {error}
-            </div>
-          )}
+          {/* Header */}
+          <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 p-6 text-white relative overflow-hidden">
+            <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full" />
+            <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full" />
 
-          {/* Step 1 — Account Info */}
-          {step === 1 && (
-            <div className="animate-fadeIn">
-              <h2 className="text-xl font-bold text-gray-800 mb-1">Account banao 🔐</h2>
-              <p className="text-gray-400 text-sm mb-5">Login details set karo</p>
-
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Full Name</label>
-              <input name="name" value={form.name} onChange={update}
-                placeholder="Adarsh Thakur"
-                className="w-full border-2 border-gray-100 rounded-xl p-3 mt-1 mb-4 focus:outline-none focus:border-green-400 bg-gray-50 focus:bg-white transition-all duration-300 text-gray-700" />
-
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Email</label>
-              <input name="email" value={form.email} onChange={update}
-                placeholder="adarsh@email.com" type="email"
-                className="w-full border-2 border-gray-100 rounded-xl p-3 mt-1 mb-4 focus:outline-none focus:border-green-400 bg-gray-50 focus:bg-white transition-all duration-300 text-gray-700" />
-
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Password</label>
-              <input name="password" value={form.password} onChange={update}
-                placeholder="••••••••" type="password"
-                className="w-full border-2 border-gray-100 rounded-xl p-3 mt-1 mb-6 focus:outline-none focus:border-green-400 bg-gray-50 focus:bg-white transition-all duration-300 text-gray-700" />
-
-              <button onClick={() => {
-                if (!form.name || !form.email || !form.password) { setError('Sab fields bharo!'); return }
-                setError(''); setStep(2)
-              }}
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] hover:shadow-xl hover:shadow-green-200 active:scale-[0.98] transition-all duration-300">
-                Continue →
-              </button>
-
-              <p className="text-center text-gray-400 text-sm mt-4">
-                Pehle se account hai?{' '}
-                <button onClick={() => navigate('/')}
-                  className="text-green-500 font-semibold hover:text-green-700">
-                  Login karo
-                </button>
-              </p>
-            </div>
-          )}
-
-          {/* Step 2 — Body Info */}
-          {step === 2 && (
-            <div className="animate-fadeIn">
-              <h2 className="text-xl font-bold text-gray-800 mb-1">Body info 💪</h2>
-              <p className="text-gray-400 text-sm mb-5">Tumhare baare mein batao</p>
-
-              <div className="grid grid-cols-3 gap-3 mb-6">
-                {[
-                  { label: '🎂 Age', name: 'age', placeholder: '19' },
-                  { label: '⚖️ Weight kg', name: 'weight', placeholder: '58' },
-                  { label: '📏 Height cm', name: 'height', placeholder: '165' },
-                ].map(field => (
-                  <div key={field.name}>
-                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{field.label}</label>
-                    <input name={field.name} value={form[field.name]} onChange={update}
-                      placeholder={field.placeholder} type="number"
-                      className="w-full border-2 border-gray-100 rounded-xl p-3 mt-1 focus:outline-none focus:border-green-400 bg-gray-50 focus:bg-white transition-all duration-300 text-gray-700 text-center font-semibold" />
+            {/* Step indicators */}
+            <div className="flex items-center gap-2 mb-4 relative z-10">
+              {steps.map((s, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className={`flex items-center gap-1.5 transition-all duration-300 ${i + 1 === step ? 'opacity-100' : i + 1 < step ? 'opacity-70' : 'opacity-40'}`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-extrabold border-2 transition-all
+                      ${i + 1 < step ? 'bg-white text-green-600 border-white' :
+                        i + 1 === step ? 'bg-white/20 text-white border-white' :
+                        'bg-transparent text-white/60 border-white/40'}`}>
+                      {i + 1 < step ? '✓' : i + 1}
+                    </div>
+                    <span className="text-xs font-semibold hidden sm:block">{s}</span>
                   </div>
-                ))}
-              </div>
-
-              <button onClick={() => {
-                if (!form.age || !form.weight || !form.height) { setError('Sab fields bharo!'); return }
-                setError(''); setStep(3)
-              }}
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] hover:shadow-xl hover:shadow-green-200 active:scale-[0.98] transition-all duration-300">
-                Continue →
-              </button>
-
-              <button onClick={() => setStep(1)} className="w-full text-gray-400 text-sm mt-3 hover:text-green-500 transition-colors">
-                ← Back
-              </button>
+                  {i < steps.length - 1 && (
+                    <div className={`h-0.5 w-8 rounded-full transition-all duration-500 ${i + 1 < step ? 'bg-white' : 'bg-white/30'}`} />
+                  )}
+                </div>
+              ))}
             </div>
-          )}
 
-          {/* Step 3 — Preferences */}
-          {step === 3 && (
-            <div className="animate-fadeIn">
-              <h2 className="text-xl font-bold text-gray-800 mb-1">Preferences 🎯</h2>
-              <p className="text-gray-400 text-sm mb-5">Diet aur goal select karo</p>
+            <h2 className="text-xl font-extrabold tracking-tight relative z-10">
+              {step === 1 ? '👋 Create Account' : step === 2 ? '💪 Body Details' : '🎯 Your Preferences'}
+            </h2>
+            <p className="text-green-100 text-sm relative z-10">
+              Step {step} of 3 — {step === 1 ? 'Set up your login' : step === 2 ? 'Help us personalize' : 'Almost done!'}
+            </p>
 
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest">🥦 Diet Type</label>
-              <select name="diet_type" value={form.diet_type} onChange={update}
-                className="w-full border-2 border-gray-100 rounded-xl p-3 mt-1 mb-5 focus:outline-none focus:border-green-400 bg-gray-50 focus:bg-white transition-all duration-300 text-gray-700">
-                <option value="">Select diet type</option>
-                <option value="Vegetarian">🥗 Vegetarian</option>
-                <option value="Non-Vegetarian">🍗 Non-Vegetarian</option>
-                <option value="Vegan">🌱 Vegan</option>
-                <option value="Keto">🥑 Keto</option>
-              </select>
+            {/* Progress bar */}
+            <div className="mt-3 h-1.5 bg-white/20 rounded-full overflow-hidden relative z-10">
+              <div className="h-full bg-white rounded-full transition-all duration-700"
+                style={{ width: `${(step / 3) * 100}%` }} />
+            </div>
+          </div>
 
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest">🏆 Your Goal</label>
-              <div className="grid grid-cols-3 gap-2 mt-2 mb-6">
-                {[
-                  { label: 'Weight Loss', icon: '⚖️' },
-                  { label: 'Muscle Gain', icon: '💪' },
-                  { label: 'Stay Fit', icon: '🏃' },
-                ].map(g => (
-                  <button key={g.label} onClick={() => setForm({ ...form, goal: g.label })}
-                    className={`p-3 rounded-2xl border-2 text-sm font-semibold transition-all duration-300 flex flex-col items-center gap-1 hover:scale-105 active:scale-95
-                      ${form.goal === g.label
-                        ? 'border-green-500 bg-green-50 text-green-700 shadow-lg shadow-green-100'
-                        : 'border-gray-100 text-gray-500 hover:border-green-200 bg-gray-50'}`}>
-                    <span className="text-2xl">{g.icon}</span>
-                    <span className="text-xs">{g.label}</span>
+          <div className="p-6">
+            {error && (
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl flex items-center gap-2">
+                ⚠️ {error}
+              </div>
+            )}
+
+            {/* STEP 1 */}
+            {step === 1 && (
+              <div style={{ animation: 'fadeUp 0.4s ease' }}>
+                <Field label="Full Name" name="name" placeholder="Adarsh Thakur" value={reg.name} />
+                <Field label="Email Address" name="email" type="email" placeholder="adarsh@email.com" value={reg.email} />
+                <Field label="Password" name="password" type="password" placeholder="Min 8 characters" value={reg.password} />
+
+                <button onClick={() => {
+                  if (!reg.name || !reg.email || !reg.password) return setError('Please fill all fields!')
+                  if (reg.password.length < 6) return setError('Password must be at least 6 characters!')
+                  setError(''); setStep(2)
+                }} className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-3.5 rounded-2xl hover:scale-[1.02] hover:shadow-xl hover:shadow-green-200 active:scale-[0.98] transition-all duration-300 mt-1">
+                  Continue →
+                </button>
+
+                <p className="text-center text-gray-400 text-sm mt-4">
+                  Already have an account?{' '}
+                  <button onClick={() => navigate('/')} className="text-green-600 font-bold hover:text-green-700 transition-colors">
+                    Sign in
                   </button>
-                ))}
+                </p>
               </div>
+            )}
 
-              <button onClick={handleRegister} disabled={loading}
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] hover:shadow-xl hover:shadow-green-200 active:scale-[0.98] transition-all duration-300 disabled:opacity-50">
-                {loading ? 'Creating account...' : 'Get Started 🚀'}
-              </button>
+            {/* STEP 2 */}
+            {step === 2 && (
+              <div style={{ animation: 'fadeUp 0.4s ease' }}>
+                <p className="text-gray-400 text-sm mb-5">
+                  These details help us calculate your personalized calorie and nutrition targets.
+                </p>
 
-              <button onClick={() => setStep(2)} className="w-full text-gray-400 text-sm mt-3 hover:text-green-500 transition-colors">
-                ← Back
-              </button>
-            </div>
-          )}
+                <div className="grid grid-cols-3 gap-3 mb-5">
+                  {[
+                    { label: '🎂 Age', name: 'age', placeholder: '22', unit: 'yrs' },
+                    { label: '⚖️ Weight', name: 'weight', placeholder: '65', unit: 'kg' },
+                    { label: '📏 Height', name: 'height', placeholder: '170', unit: 'cm' },
+                  ].map(f => (
+                    <div key={f.name}>
+                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">{f.label}</label>
+                      <div className="relative">
+                        <input name={f.name} type="number" placeholder={f.placeholder} value={reg[f.name]} onChange={up}
+                          className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-3 py-3 text-gray-900 font-bold text-sm text-center focus:outline-none focus:border-green-400 focus:bg-white transition-all" />
+                        <span className="absolute -bottom-4 left-0 right-0 text-center text-[10px] text-gray-300 font-medium">{f.unit}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* BMI Preview */}
+                {reg.weight && reg.height && (
+                  <div className="mt-6 mb-5 bg-green-50 border border-green-100 rounded-2xl p-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-400 font-semibold">Estimated BMI</p>
+                      <p className="text-2xl font-extrabold text-green-600">
+                        {(parseFloat(reg.weight) / ((parseFloat(reg.height)/100) ** 2)).toFixed(1)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-400 font-semibold">Status</p>
+                      <p className="text-sm font-bold text-green-600">
+                        {(() => {
+                          const b = parseFloat(reg.weight) / ((parseFloat(reg.height)/100) ** 2)
+                          if (b < 18.5) return '🔵 Underweight'
+                          if (b < 25) return '🟢 Normal'
+                          if (b < 30) return '🟡 Overweight'
+                          return '🔴 Obese'
+                        })()}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <button onClick={() => {
+                  if (!reg.age || !reg.weight || !reg.height) return setError('Please fill all fields!')
+                  setError(''); setStep(3)
+                }} className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-3.5 rounded-2xl hover:scale-[1.02] hover:shadow-xl hover:shadow-green-200 active:scale-[0.98] transition-all duration-300">
+                  Continue →
+                </button>
+                <button onClick={() => setStep(1)} className="w-full text-center text-gray-400 text-sm mt-3 hover:text-green-600 transition-colors">← Back</button>
+              </div>
+            )}
+
+            {/* STEP 3 */}
+            {step === 3 && (
+              <div style={{ animation: 'fadeUp 0.4s ease' }}>
+                <div className="mb-5">
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">🥦 Diet Preference</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { v: 'Vegetarian', i: '🥗', d: 'Plant-based Indian foods' },
+                      { v: 'Non-Vegetarian', i: '🍗', d: 'Includes meat & eggs' },
+                      { v: 'Vegan', i: '🌱', d: 'No animal products' },
+                      { v: 'Keto', i: '🥑', d: 'Low carb, high fat' },
+                    ].map(opt => (
+                      <button key={opt.v} onClick={() => setReg(p => ({ ...p, diet_type: opt.v }))}
+                        className={`p-3 rounded-2xl border-2 text-left transition-all duration-200 hover:scale-[1.02]
+                          ${reg.diet_type === opt.v
+                            ? 'border-green-500 bg-green-50 shadow-md shadow-green-100'
+                            : 'border-gray-100 bg-gray-50 hover:border-green-200'}`}>
+                        <span className="text-xl">{opt.i}</span>
+                        <p className={`text-xs font-bold mt-1 ${reg.diet_type === opt.v ? 'text-green-700' : 'text-gray-700'}`}>{opt.v}</p>
+                        <p className="text-[10px] text-gray-400 mt-0.5">{opt.d}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-5">
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">🏆 Primary Goal</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { v: 'Lose Weight', i: '⚖️', d: 'Calorie deficit' },
+                      { v: 'Build Muscle', i: '💪', d: 'High protein' },
+                      { v: 'Stay Fit', i: '🏃', d: 'Maintain health' },
+                    ].map(g => (
+                      <button key={g.v} onClick={() => setReg(p => ({ ...p, goal: g.v }))}
+                        className={`py-3 px-2 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all duration-200 hover:scale-105
+                          ${reg.goal === g.v
+                            ? 'border-green-500 bg-green-50 shadow-md shadow-green-100'
+                            : 'border-gray-100 bg-gray-50 hover:border-green-200'}`}>
+                        <span className="text-2xl">{g.i}</span>
+                        <p className={`text-xs font-bold ${reg.goal === g.v ? 'text-green-700' : 'text-gray-600'}`}>{g.v}</p>
+                        <p className="text-[10px] text-gray-400">{g.d}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button onClick={doRegister} disabled={loading}
+                  className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-3.5 rounded-2xl hover:scale-[1.02] hover:shadow-xl hover:shadow-green-200 active:scale-[0.98] transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2">
+                  {loading ? (
+                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Creating account...</>
+                  ) : '🚀 Get Started Free'}
+                </button>
+                <button onClick={() => setStep(2)} className="w-full text-center text-gray-400 text-sm mt-3 hover:text-green-600 transition-colors">← Back</button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Trust badges */}
+        <div className="flex justify-center gap-4 mt-5">
+          {['🔒 Secure', '✅ Free Forever', '🇮🇳 Indian Foods'].map(b => (
+            <span key={b} className="text-xs text-gray-400 font-medium">{b}</span>
+          ))}
         </div>
       </div>
 
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(12px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fadeIn { animation: fadeIn 0.4s ease-out; }
       `}</style>
     </div>
   )
 }
-
-export default Register
