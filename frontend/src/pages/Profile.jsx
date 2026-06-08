@@ -1,81 +1,127 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+const API = 'https://nutriai-backend-xspo.onrender.com'
+
 export default function Profile() {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [streak, setStreak] = useState(null)
   const [editing, setEditing] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [form, setForm] = useState({
-    name: '', age: '', weight: '', height: '', diet_type: '', goal: ''
+    name: '', weight: '', height: '', target_weight: '',
+    diet_type: '', fitness_goal: '', activity_level: '',
+    daily_cal_goal: '', water_goal: ''
   })
+
+  const token = localStorage.getItem('token')
 
   useEffect(() => {
     const u = localStorage.getItem('user')
-    if (!u) { navigate('/'); return }
-    const parsed = JSON.parse(u)
-    setUser(parsed)
-    setForm({
-      name: parsed.name || '',
-      age: parsed.age || '',
-      weight: parsed.weight || '',
-      height: parsed.height || '',
-      diet_type: parsed.diet_type || '',
-      goal: parsed.goal || '',
-    })
-  }, [navigate])
+    if (!u || !token) { navigate('/'); return }
+    setUser(JSON.parse(u))
+    fetchProfile()
+  }, [])
+
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch(`${API}/api/profile`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (res.ok) {
+        const d = await res.json()
+        setUser(d.user)
+        setProfile(d.profile)
+        setStreak(d.streak)
+        setForm({
+          name:           d.user.name || '',
+          weight:         d.profile.current_weight || '',
+          height:         d.profile.height || '',
+          target_weight:  d.profile.target_weight || '',
+          diet_type:      d.profile.diet_type || '',
+          fitness_goal:   d.profile.fitness_goal || '',
+          activity_level: d.profile.activity_level || '',
+          daily_cal_goal: d.profile.daily_cal_goal || 1800,
+          water_goal:     d.profile.water_goal || 2.5,
+        })
+      }
+    } catch (e) { console.error(e) }
+    finally { setLoading(false) }
+  }
 
   const up = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }))
 
-  const saveProfile = () => {
-    const updated = { ...user, ...form }
-    localStorage.setItem('user', JSON.stringify(updated))
-    setUser(updated)
-    setEditing(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+  const saveProfile = async () => {
+    try {
+      const res = await fetch(`${API}/api/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          name:           form.name,
+          weight:         parseFloat(form.weight),
+          height:         parseFloat(form.height),
+          target_weight:  parseFloat(form.target_weight),
+          diet_type:      form.diet_type,
+          fitness_goal:   form.fitness_goal,
+          activity_level: form.activity_level,
+          daily_cal_goal: parseInt(form.daily_cal_goal),
+          water_goal:     parseFloat(form.water_goal),
+        })
+      })
+      if (res.ok) {
+        const d = await res.json()
+        setSaved(true)
+        setEditing(false)
+        setTimeout(() => setSaved(false), 3000)
+        // Update localStorage
+        const stored = JSON.parse(localStorage.getItem('user') || '{}')
+        localStorage.setItem('user', JSON.stringify({ ...stored, name: form.name }))
+        fetchProfile() // Refresh data
+      }
+    } catch (e) { console.error(e) }
   }
 
-  const logout = () => {
-    localStorage.clear()
-    navigate('/')
-  }
-
-  const getBMI = () => {
-    if (!user?.weight || !user?.height) return null
-    const h = user.height / 100
-    return (user.weight / (h * h)).toFixed(1)
-  }
+  const logout = () => { localStorage.clear(); navigate('/') }
 
   const getBMIcat = (bmi) => {
     if (!bmi) return { label: 'N/A', color: 'text-gray-400' }
     if (bmi < 18.5) return { label: 'Underweight', color: 'text-blue-500' }
-    if (bmi < 25) return { label: 'Normal', color: 'text-green-500' }
-    if (bmi < 30) return { label: 'Overweight', color: 'text-yellow-500' }
+    if (bmi < 25)   return { label: 'Normal ✅',   color: 'text-green-500' }
+    if (bmi < 30)   return { label: 'Overweight',  color: 'text-yellow-500' }
     return { label: 'Obese', color: 'text-red-500' }
   }
 
-  if (!user) return null
+  if (loading) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-gray-500 font-medium">Loading profile...</p>
+      </div>
+    </div>
+  )
 
-  const bmi = getBMI()
-  const bmiCat = getBMIcat(bmi)
+  const bmiCat = getBMIcat(profile?.bmi)
 
   const stats = [
-    { label: 'Age', value: user.age || '—', unit: 'yrs', icon: '🎂' },
-    { label: 'Weight', value: user.weight || '—', unit: 'kg', icon: '⚖️' },
-    { label: 'Height', value: user.height || '—', unit: 'cm', icon: '📏' },
-    { label: 'BMI', value: bmi || '—', unit: '', icon: '🏃', extra: bmiCat },
+    { label: 'Weight',   value: profile?.current_weight || '—', unit: 'kg',  icon: '⚖️' },
+    { label: 'Height',   value: profile?.height || '—',          unit: 'cm',  icon: '📏' },
+    { label: 'BMI',      value: profile?.bmi || '—',             unit: '',    icon: '🏃', extra: bmiCat },
+    { label: 'Streak',   value: streak?.current_streak || 0,     unit: 'days',icon: '🔥' },
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
+    <div className="min-h-screen bg-gray-50" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
-      {/* Navbar */}
+      {/* NAVBAR */}
       <nav className="bg-white border-b border-gray-100 px-6 py-4 sticky top-0 z-50 shadow-sm">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <button onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-2 text-gray-400 hover:text-green-600 transition-colors font-semibold text-sm">
-            ← Back to Dashboard
+            className="flex items-center gap-2 text-gray-400 hover:text-green-600 transition-colors font-semibold text-sm group">
+            <span className="group-hover:-translate-x-0.5 transition-transform">←</span>
+            Dashboard
           </button>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
@@ -83,8 +129,7 @@ export default function Profile() {
             </div>
             <span className="font-extrabold text-gray-900">My Profile</span>
           </div>
-          <button onClick={logout}
-            className="text-sm font-semibold text-red-400 hover:text-red-600 transition-colors">
+          <button onClick={logout} className="text-sm font-semibold text-red-400 hover:text-red-600 transition-colors">
             Logout ↩
           </button>
         </div>
@@ -92,9 +137,9 @@ export default function Profile() {
 
       <div className="max-w-4xl mx-auto px-6 py-10">
 
-        {/* Success Toast */}
+        {/* Toast */}
         {saved && (
-          <div className="fixed top-20 right-6 z-50 bg-green-500 text-white px-5 py-3 rounded-2xl shadow-xl shadow-green-200 flex items-center gap-2 font-semibold text-sm">
+          <div className="fixed top-20 right-6 z-50 bg-green-500 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 font-semibold text-sm">
             ✅ Profile saved successfully!
           </div>
         )}
@@ -105,20 +150,25 @@ export default function Profile() {
           <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-white/10 rounded-full" />
           <div className="flex items-center gap-6 relative z-10">
             <div className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center text-4xl font-extrabold border-2 border-white/30 shadow-lg">
-              {user.name?.[0]?.toUpperCase() || '?'}
+              {user?.name?.[0]?.toUpperCase() || '?'}
             </div>
             <div>
-              <h1 className="text-3xl font-extrabold tracking-tight">{user.name}</h1>
-              <p className="text-green-100 text-sm mt-1">{user.email}</p>
-              <div className="flex gap-2 mt-3">
-                {user.diet_type && (
+              <h1 className="text-3xl font-extrabold tracking-tight">{user?.name}</h1>
+              <p className="text-green-100 text-sm mt-1">{user?.email}</p>
+              <div className="flex gap-2 mt-3 flex-wrap">
+                {profile?.diet_type && (
                   <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full border border-white/20">
-                    🥗 {user.diet_type}
+                    🥗 {profile.diet_type}
                   </span>
                 )}
-                {user.goal && (
+                {profile?.fitness_goal && (
                   <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full border border-white/20">
-                    🎯 {user.goal}
+                    🎯 {profile.fitness_goal?.replace('_', ' ')}
+                  </span>
+                )}
+                {profile?.activity_level && (
+                  <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full border border-white/20">
+                    ⚡ {profile.activity_level}
                   </span>
                 )}
               </div>
@@ -154,24 +204,46 @@ export default function Profile() {
             </div>
 
             <div className="space-y-4">
-              {[
-                { label: 'Full Name', name: 'name', type: 'text', placeholder: 'Adarsh Thakur' },
-                { label: 'Age (years)', name: 'age', type: 'number', placeholder: '19' },
-                { label: 'Weight (kg)', name: 'weight', type: 'number', placeholder: '65' },
-                { label: 'Height (cm)', name: 'height', type: 'number', placeholder: '170' },
-              ].map(f => (
-                <div key={f.name}>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">{f.label}</label>
-                  {editing ? (
-                    <input name={f.name} type={f.type} placeholder={f.placeholder} value={form[f.name]} onChange={up}
-                      className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-2.5 text-gray-900 font-semibold focus:outline-none focus:border-green-400 focus:bg-white transition-all text-sm" />
-                  ) : (
-                    <p className="text-gray-700 font-semibold text-sm py-2.5 px-4 bg-gray-50 rounded-xl">
-                      {form[f.name] || '—'}
-                    </p>
-                  )}
-                </div>
-              ))}
+
+              {/* Name */}
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Full Name</label>
+                {editing ? (
+                  <input name="name" value={form.name} onChange={up}
+                    className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-2.5 text-gray-900 font-semibold focus:outline-none focus:border-green-400 focus:bg-white transition-all text-sm" />
+                ) : (
+                  <p className="text-gray-700 font-semibold text-sm py-2.5 px-4 bg-gray-50 rounded-xl">{form.name || '—'}</p>
+                )}
+              </div>
+
+              {/* Weight & Height */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: 'Weight (kg)', name: 'weight', placeholder: '65' },
+                  { label: 'Height (cm)', name: 'height', placeholder: '170' },
+                ].map(f => (
+                  <div key={f.name}>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">{f.label}</label>
+                    {editing ? (
+                      <input name={f.name} type="number" placeholder={f.placeholder} value={form[f.name]} onChange={up}
+                        className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-3 py-2.5 text-gray-900 font-semibold focus:outline-none focus:border-green-400 focus:bg-white transition-all text-sm text-center" />
+                    ) : (
+                      <p className="text-gray-700 font-semibold text-sm py-2.5 px-3 bg-gray-50 rounded-xl text-center">{form[f.name] || '—'}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Target Weight */}
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Target Weight (kg)</label>
+                {editing ? (
+                  <input name="target_weight" type="number" placeholder="60" value={form.target_weight} onChange={up}
+                    className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-2.5 text-gray-900 font-semibold focus:outline-none focus:border-green-400 focus:bg-white transition-all text-sm" />
+                ) : (
+                  <p className="text-gray-700 font-semibold text-sm py-2.5 px-4 bg-gray-50 rounded-xl">{form.target_weight || '—'}</p>
+                )}
+              </div>
 
               {/* Diet Type */}
               <div>
@@ -180,39 +252,68 @@ export default function Profile() {
                   <select name="diet_type" value={form.diet_type} onChange={up}
                     className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-2.5 text-gray-900 font-semibold focus:outline-none focus:border-green-400 transition-all text-sm">
                     <option value="">Select diet</option>
-                    <option value="Vegetarian">🥗 Vegetarian</option>
-                    <option value="Non-Vegetarian">🍗 Non-Vegetarian</option>
-                    <option value="Vegan">🌱 Vegan</option>
-                    <option value="Keto">🥑 Keto</option>
+                    <option value="vegetarian">🥗 Vegetarian</option>
+                    <option value="non_vegetarian">🍗 Non-Vegetarian</option>
+                    <option value="vegan">🌱 Vegan</option>
+                    <option value="keto">🥑 Keto</option>
                   </select>
                 ) : (
-                  <p className="text-gray-700 font-semibold text-sm py-2.5 px-4 bg-gray-50 rounded-xl">
-                    {form.diet_type || '—'}
-                  </p>
+                  <p className="text-gray-700 font-semibold text-sm py-2.5 px-4 bg-gray-50 rounded-xl">{form.diet_type || '—'}</p>
                 )}
               </div>
 
-              {/* Goal */}
-              {editing && (
-                <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Goal</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[['Lose Weight','⚖️'],['Build Muscle','💪'],['Stay Fit','🏃']].map(([l,ic]) => (
-                      <button key={l} onClick={() => setForm(p => ({...p, goal: l}))}
-                        className={`py-2.5 px-2 rounded-xl border-2 text-xs font-bold flex flex-col items-center gap-1 transition-all
-                          ${form.goal === l ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-100 bg-gray-50 text-gray-500'}`}>
-                        <span className="text-lg">{ic}</span>{l}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* Activity Level */}
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Activity Level</label>
+                {editing ? (
+                  <select name="activity_level" value={form.activity_level} onChange={up}
+                    className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-2.5 text-gray-900 font-semibold focus:outline-none focus:border-green-400 transition-all text-sm">
+                    <option value="">Select level</option>
+                    <option value="sedentary">🪑 Sedentary</option>
+                    <option value="light">🚶 Light</option>
+                    <option value="moderate">🏃 Moderate</option>
+                    <option value="active">💪 Active</option>
+                    <option value="very_active">🏋️ Very Active</option>
+                  </select>
+                ) : (
+                  <p className="text-gray-700 font-semibold text-sm py-2.5 px-4 bg-gray-50 rounded-xl">{form.activity_level || '—'}</p>
+                )}
+              </div>
 
+              {/* Goals */}
               {editing && (
-                <button onClick={saveProfile}
-                  className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-3.5 rounded-2xl hover:scale-[1.02] hover:shadow-lg hover:shadow-green-200 active:scale-[0.98] transition-all duration-300 mt-2">
-                  💾 Save Changes
-                </button>
+                <>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">🏆 Fitness Goal</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[['weight_loss','⚖️','Lose Weight'],['muscle_gain','💪','Build Muscle'],['maintenance','🏃','Stay Fit']].map(([v,ic,l]) => (
+                        <button key={v} onClick={() => setForm(p => ({ ...p, fitness_goal: v }))}
+                          className={`py-2.5 px-2 rounded-xl border-2 text-xs font-bold flex flex-col items-center gap-1 transition-all
+                            ${form.fitness_goal === v ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-100 bg-gray-50 text-gray-500'}`}>
+                          <span className="text-lg">{ic}</span>{l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Cal Goal (kcal)</label>
+                      <input name="daily_cal_goal" type="number" value={form.daily_cal_goal} onChange={up}
+                        className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-3 py-2.5 text-gray-900 font-semibold focus:outline-none focus:border-green-400 focus:bg-white transition-all text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Water Goal (L)</label>
+                      <input name="water_goal" type="number" step="0.5" value={form.water_goal} onChange={up}
+                        className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-3 py-2.5 text-gray-900 font-semibold focus:outline-none focus:border-green-400 focus:bg-white transition-all text-sm" />
+                    </div>
+                  </div>
+
+                  <button onClick={saveProfile}
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-3.5 rounded-2xl hover:scale-[1.02] hover:shadow-lg hover:shadow-green-200 active:scale-[0.98] transition-all duration-300 mt-2">
+                    💾 Save Changes
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -220,18 +321,42 @@ export default function Profile() {
           {/* Right column */}
           <div className="space-y-4">
 
-            {/* Quick Links */}
+            {/* Progress Card */}
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">📊 Progress</h2>
+              <div className="space-y-4">
+                {[
+                  { label: 'Streak', value: streak?.current_streak || 0, max: Math.max(streak?.longest_streak || 7, 7), unit: 'days', color: 'from-orange-400 to-red-500' },
+                  { label: 'Longest Streak', value: streak?.longest_streak || 0, max: Math.max(streak?.longest_streak || 7, 7), unit: 'days', color: 'from-purple-400 to-violet-500' },
+                  { label: 'Total Active Days', value: streak?.total_days || 0, max: 100, unit: 'days', color: 'from-blue-400 to-cyan-500' },
+                  { label: 'Goal Progress', value: streak?.goal_progress || 0, max: 100, unit: '%', color: 'from-green-400 to-emerald-500' },
+                ].map(m => (
+                  <div key={m.label}>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="text-xs font-bold text-gray-500">{m.label}</span>
+                      <span className="text-xs font-extrabold text-gray-900">{m.value} {m.unit}</span>
+                    </div>
+                    <div className="bg-gray-100 rounded-full h-2 overflow-hidden">
+                      <div className={`bg-gradient-to-r ${m.color} rounded-full h-2 transition-all duration-700`}
+                        style={{ width: `${Math.min((m.value / m.max) * 100, 100)}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Actions */}
             <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
               <h2 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h2>
               <div className="space-y-2">
                 {[
-                  { icon:'📊', label:'View Dashboard', desc:'See your health metrics', action:() => navigate('/dashboard'), color:'hover:border-green-200' },
-                  { icon:'🤖', label:'AI Consultation', desc:'Chat with your AI dietitian', action:() => navigate('/consultation'), color:'hover:border-purple-200' },
-                  { icon:'📋', label:'Meal Plan', desc:'View your weekly diet plan', action:() => navigate('/mealplan'), color:'hover:border-blue-200' },
-                  { icon:'⚖️', label:'BMI Calculator', desc:'Check your body mass index', action:() => navigate('/bmi'), color:'hover:border-orange-200' },
+                  { icon: '📊', label: 'Dashboard', desc: 'See health metrics', action: () => navigate('/dashboard') },
+                  { icon: '🤖', label: 'AI Chat', desc: 'Get diet advice', action: () => navigate('/consultation') },
+                  { icon: '📋', label: 'Meal Plan', desc: 'View weekly plan', action: () => navigate('/mealplan') },
+                  { icon: '⚖️', label: 'BMI Check', desc: 'Calculate BMI', action: () => navigate('/bmi') },
                 ].map((item, i) => (
                   <button key={i} onClick={item.action}
-                    className={`w-full flex items-center gap-4 p-4 rounded-2xl border border-gray-100 ${item.color} hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 text-left group`}>
+                    className="w-full flex items-center gap-4 p-3.5 rounded-2xl border border-gray-100 hover:border-green-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 text-left group">
                     <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                       {item.icon}
                     </div>
@@ -245,10 +370,10 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Danger Zone */}
+            {/* Logout */}
             <div className="bg-white rounded-3xl p-6 border border-red-100 shadow-sm">
               <h2 className="text-lg font-bold text-gray-900 mb-2">Account</h2>
-              <p className="text-gray-400 text-sm mb-4">Manage your account settings</p>
+              <p className="text-gray-400 text-sm mb-4">Manage your account</p>
               <button onClick={logout}
                 className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 rounded-2xl border border-red-200 transition-all duration-300 hover:scale-[1.02] text-sm">
                 🚪 Logout
@@ -259,4 +384,4 @@ export default function Profile() {
       </div>
     </div>
   )
-} 
+}
