@@ -131,32 +131,16 @@ export default function Login() {
   }
 
   /* ── FIELD COMPONENT ── */
-  function Field({
-  label,
-  name,
-  type = "text",
-  placeholder,
-  value,
-  onChange,
-}) {
-  return (
+  const Field = ({ label, name, type = 'text', placeholder, value, onChange }) => (
     <div className="mb-4">
-      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">
-        {label}
-      </label>
-
+      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">{label}</label>
       <input
-        name={name}
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        autoComplete="off"
+        name={name} type={type} placeholder={placeholder}
+        value={value} onChange={onChange}
         className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-gray-900 font-medium text-sm focus:outline-none focus:border-green-400 focus:bg-white focus:shadow-md focus:shadow-green-100 transition-all duration-200 placeholder-gray-300"
       />
     </div>
-  );
-}
+  )
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
