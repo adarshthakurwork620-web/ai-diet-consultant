@@ -6,7 +6,7 @@ const API = 'https://nutriai-backend-xspo.onrender.com'
 export default function Login() {
   const navigate = useNavigate()
   const [modal, setModal] = useState(null) // 'login' | 'register' | 'forgot'
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(1) // For multi-step modals
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -453,7 +453,7 @@ export default function Login() {
               </div>
             ))}
           </div>
-          
+
         </div>
       </footer>
 
@@ -496,12 +496,12 @@ export default function Login() {
               {/* ── LOGIN ── */}
               {modal === 'login' && (
                 <>
-                  <Field label="Email Address" name="email" type="email" placeholder="adarsh@email.com" value={loginForm.email} onChange={upL} />
+                  <Field label="Email Address" name="email" type="email" placeholder="" value={loginForm.email} onChange={upL} />
 
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Password</label>
-                      <button onClick={() => { setModal('forgot'); setError(''); setSuccess('') }}
+                      <button onClick={() => { setModa('forgot'); setError(''); setSuccess('') }}
                         className="text-xs text-green-600 font-semibold hover:text-green-700 transition-colors">
                         Forgot Password?
                       </button>
@@ -510,7 +510,7 @@ export default function Login() {
                       <input
                         name="password"
                         type={loginForm.showPwd ? 'text' : 'password'}
-                        placeholder="••••••••"
+                        placeholder=""
                         value={loginForm.password}
                         onChange={upL}
                         className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 pr-12 text-gray-900 font-medium text-sm focus:outline-none focus:border-green-400 focus:bg-white focus:shadow-md focus:shadow-green-100 transition-all placeholder-gray-300"
@@ -543,7 +543,7 @@ export default function Login() {
                       <p className="text-gray-400 text-sm mb-5 leading-relaxed">
                         Enter your registered email address. We'll send you a link to reset your password.
                       </p>
-                      <Field label="Email Address" name="forgotEmail" type="email" placeholder="adarsh@email.com"
+                      <Field label="Email Address" name="forgotEmail" type="email" placeholder=""
                         value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} />
 
                       <button onClick={doForgotPassword} disabled={loading}
@@ -583,8 +583,8 @@ export default function Login() {
               {/* ── REGISTER STEP 1 ── */}
               {modal === 'register' && step === 1 && (
                 <>
-                  <Field label="Full Name" name="name" placeholder="Adarsh Thakur" value={reg.name} onChange={upR} />
-                  <Field label="Email Address" name="email" type="email" placeholder="adarsh@email.com" value={reg.email} onChange={upR} />
+                  <Field label="Full Name" name="name" placeholder="" value={reg.name} onChange={upR} />
+                  <Field label="Email Address" name="email" type="email" placeholder="" value={reg.email} onChange={upR} />
 
                   <div className="mb-4">
                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Password</label>
@@ -632,7 +632,7 @@ export default function Login() {
                 <>
                   <p className="text-gray-400 text-sm mb-4">Help us personalize your AI diet plan</p>
                   <div className="grid grid-cols-3 gap-3 mb-5">
-                    {[['🎂 Age', 'age', '22'], ['⚖️ Weight', 'weight', '65'], ['📏 Height', 'height', '170']].map(([label, name, ph]) => (
+                    {[['🎂 Age', 'age', ''], ['⚖️ Weight', 'weight', ''], ['📏 Height', 'height', '']].map(([label, name, ph]) => (
                       <div key={name}>
                         <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">{label}</label>
                         <input name={name} type="number" placeholder={ph} value={reg[name]} onChange={upR}
