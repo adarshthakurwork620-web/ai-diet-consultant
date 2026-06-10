@@ -148,8 +148,8 @@ export default function Register() {
             {/* ── STEP 1 ── */}
             {step === 1 && (
               <div style={{ animation: 'fadeUp 0.4s ease' }}>
-                <Field label="Full Name" name="name" placeholder="Full Name" value={reg.name} onChange={up} />
-                <Field label="Email Address" name="email" type="email" placeholder="example@email.com" value={reg.email} onChange={up} />
+                <Field label="Full Name" name="name" placeholder="" value={reg.name} onChange={up} />
+                <Field label="Email Address" name="email" type="email" placeholder="" value={reg.email} onChange={up} />
 
                 {/* Password with strength */}
                 <div className="mb-5">
@@ -200,8 +200,8 @@ export default function Register() {
                 <div className="grid grid-cols-3 gap-3 mb-2">
                   {[
                     { label: '🎂 Age', name: 'age', placeholder: '', unit: 'yrs' },
-                    { label: '⚖️ Weight', name: 'weight(kg)', placeholder: '', unit: 'kg' },
-                    { label: '📏 Height', name: 'height(cm)', placeholder: '', unit: 'cm' },
+                    { label: '⚖️ Weight', name: 'weight', placeholder: '', unit: 'kg' },
+                    { label: '📏 Height', name: 'height', placeholder: '', unit: 'cm' },
                   ].map(f => (
                     <div key={f.name}>
                       <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">{f.label}</label>
