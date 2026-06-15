@@ -1,76 +1,211 @@
-# 🥗 NutriAI - AI-Powered Diet Consultation 
+# 🥗 AI-Powered Personalized Diet Consultant (NutriAI)
 
-> A full-stack AI diet consultation web application built with React, Flask, and Groq AI.
+An intelligent web-based diet consultation platform that provides personalized nutrition recommendations, BMI analysis, meal planning, and health tracking using Artificial Intelligence.
 
+ai-diet-consultant : https://ai-diet-consultant-liart.vercel.app
 
----
+## 📌 Overview
 
-## 🌐 Live Demo
+NutriAI is a full-stack AI-powered healthcare application designed to help users maintain a healthy lifestyle through personalized dietary guidance. The platform analyzes user health data such as age, height, weight, activity level, dietary preferences, allergies, and fitness goals to generate customized meal plans and nutritional recommendations.
 
- ai-diet-consultant : https://ai-diet-consultant-liart.vercel.app
-
----
-Working
-
-> Login → Register → Dashboard → AI Chat → Meal Plan
+The project bridges the gap between professional diet consultation and everyday users by providing affordable, accessible, and intelligent dietary assistance.
 
 ---
 
-✨ Features
+## 🚀 Features
 
-- 🔐 **JWT Authentication** — Secure login & registration system
-- 🤖 **AI Consultation** — Real-time diet advice powered by Groq AI (LLaMA 3.1)
-- 📊 **Dashboard** — Personalized health metrics & calorie tracking
-- 🍽️ **Meal Planner** — 7-day Indian meal plan generation
-- 📱 **Responsive UI** — Mobile-friendly design with Tailwind CSS
-- 🗄️ **Database** — SQLite with Flask-SQLAlchemy ORM
+### 👤 User Management
 
----
+* User Registration & Authentication
+* Secure Login System
+* Personalized User Profiles
 
-🛠️ Tech Stack
+### 📊 Health Analysis
 
-Frontend
-| Technology | Purpose |
-|---|---|
-| React 18 + Vite | UI Framework |
-| Tailwind CSS | Styling |
-| React Router v6 | Navigation |
+* BMI Calculation
+* Health Status Assessment
+* Nutrition Requirement Analysis
 
- Backend
-| Technology | Purpose |
-|---|---|
-| Python Flask | REST API |
-| Flask-SQLAlchemy | ORM |
-| SQLite | Database |
-| JWT | Authentication |
-| Groq API | AI Engine |
-| Gunicorn | Production Server |
+### 🤖 AI-Powered Recommendations
 
----
+* Personalized Diet Plans
+* AI Nutrition Assistant
+* Intelligent Meal Suggestions
+* Context-Aware Dietary Guidance
 
-🚀 Getting Started
+### 🍽️ Meal Planning
 
-Prerequisites
-- Node.js 18+
-- Python 3.10+
-- Groq API Key (free at console.groq.com)
+* Daily Meal Recommendations
+* Weekly Meal Planner
+* Calorie Distribution
+* Macronutrient Breakdown
+
+### 📈 Progress Tracking
+
+* Weight Monitoring
+* Goal Tracking
+* Health Progress Analytics
+* Historical Records Management
 
 ---
 
-🔌 API Endpoints
+## 🏗️ System Architecture
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/register` | User registration |
-| POST | `/api/login` | User login |
-| POST | `/api/chat` | AI diet consultation |
-| GET | `/api/health` | Health check |
+```text
+User
+  ↓
+React Frontend
+  ↓
+Flask Backend APIs
+  ↓
+PostgreSQL Database
+  ↓
+AI Engine (OpenAI/Gemini)
+  ↓
+Personalized Diet Recommendations
+```
 
 ---
 
-<<<<<<< HEAD
+## 💻 Technology Stack
+
+### Frontend
+
+* React.js
+* Tailwind CSS
+* JavaScript
+* HTML5
+* CSS3
+
+### Backend
+
+* Python
+* Flask
+
+### Database
+
+* PostgreSQL
+
+### Artificial Intelligence
+
+* OpenAI API
+
+### Deployment
+
+* Render Cloud Platform
+
 ---
 
-=======
->>>>>>> cc33faddfa0f929145ab7f6623d5747d316a0415
-⭐ **Star this repo if you found it helpful!**
+## 📂 Project Modules
+
+### 1. Landing Page
+
+Interactive homepage introducing NutriAI and its core features.
+
+### 2. Registration System
+
+Multi-step registration process for collecting detailed user information.
+
+### 3. User Dashboard
+
+Centralized dashboard displaying health insights and recommendations.
+
+### 4. Profile Management
+
+Manage personal details, dietary preferences, allergies, and fitness goals.
+
+### 5. BMI Calculator
+
+Automatically calculates Body Mass Index and health category.
+
+### 6. AI Assistant
+
+Chat-based nutrition assistant for answering diet and health-related queries.
+
+### 7. Weekly Meal Planner
+
+Generates customized weekly meal schedules based on user goals.
+
+---
+
+## 🔍 Problems Solved
+
+* Lack of personalized diet recommendations
+* Limited access to nutrition experts
+* Complex nutritional calculations
+* Lack of progress monitoring
+* Time-consuming manual diet planning
+* Growing lifestyle-related health issues
+
+---
+
+## 🎯 Objectives
+
+* Provide personalized nutritional guidance
+* Generate AI-powered diet plans
+* Calculate BMI automatically
+* Track user progress efficiently
+* Store user data securely
+* Promote healthier lifestyle choices
+* Make nutrition consultation affordable and accessible
+
+---
+
+
+## 🔮 Future Enhancements
+
+* Android & iOS Mobile App
+* Smartwatch Integration
+* Food Image Recognition
+* Voice-Based AI Assistant
+* Real-Time Health Monitoring
+* Personalized Workout Plans
+* Dietician Consultation Integration
+* Multilingual Support
+* Grocery List Generation
+* Advanced Health Analytics
+
+---
+
+## ⚙️ Installation
+
+### Clone Repository
+
+```bash
+git clone https://github.com/your-username/ai-diet-consultant.git
+cd ai-diet-consultant
+```
+
+### Backend Setup
+
+```bash
+cd backend
+
+python -m venv venv
+
+venv\Scripts\activate
+
+pip install -r requirements.txt
+
+python app.py
+```
+
+### Frontend Setup
+
+```bash
+cd frontend
+
+npm install
+
+npm run dev
+```
+
+---
+
+## 👨‍💻 Author
+
+**Adarsh Kumar Thakur**
+B.Tech (Hons) CSE - Data Analytics
+SAGE University, Bhopal
+
+o provide personalized nutrition and healthcare recommendations.
