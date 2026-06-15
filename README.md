@@ -92,8 +92,8 @@ Personalized Diet Recommendations
 
 ### Deployment
 
-* Render Cloud Platform
-
+* Backend => Render Cloud Platform
+* Frontend => vercel Platfrom
 ---
 
 ## 📂 Project Modules
