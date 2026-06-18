@@ -84,7 +84,7 @@ Personalized Diet Recommendations
 
 ### Database
 
-* PostgreSQL
+* local database
 
 ### Artificial Intelligence
 
